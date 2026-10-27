@@ -1,4 +1,5 @@
 import os
+from pickle import TRUE
 import time
 from dotenv import load_dotenv
 from google import genai
@@ -19,14 +20,17 @@ client = genai.Client(api_key = os.getenv("GEMINI_API_KEY"))
 
 prompt = "Hello there, what is your name?"
 
-response = client.interactions.create(
+stream = client.interactions.create(
     model = "gemini-3.5-flash-lite",
     system_instruction = "You are a strict interviewer",
     input = prompt,
     generation_config = {
         "thinking_level" : "low",
         "max_output_tokens" : 200
-    }
+    },
+    stream = True
 )
-print(response.output_text)
-
+for event in stream:
+    if event.event_type == "step.delta":
+        if event.delta.type == "text":
+            print(event.delta.text, end="")
