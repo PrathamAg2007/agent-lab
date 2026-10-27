@@ -1,21 +1,32 @@
 import os
+import time
 from dotenv import load_dotenv
 from google import genai
-import time
 
 load_dotenv()
 
-prompt = "Write a one line slogan for a coffee shop."
 
 client = genai.Client(api_key = os.getenv("GEMINI_API_KEY"))
 
-for temp in [0.0, 0.0, 0.4, 0.8, 1.5, 1.5]:
-    response = client.models.generate_content(
-        model = "gemini-3.5-flash-lite",
-        contents = prompt,
-        config = genai.types.GenerateContentConfig(temperature = temp)
-    )
-    print(temp, '----', response.text)
-    time.sleep(2)
+# for temp in [0.0, 0.0, 0.4, 0.8, 1.5, 1.5]:
+#     response = client.models.generate_content(
+#         model = "gemini-3.5-flash-lite",
+#         contents = prompt,
+#         config = genai.types.GenerateContentConfig(temperature = temp)
+#     )
+#     print(temp, '----', response.text)
+#     time.sleep(2)
 
+prompt = "Hello there, what is your name?"
+
+response = client.interactions.create(
+    model = "gemini-3.5-flash-lite",
+    system_instruction = "You are a strict interviewer",
+    input = prompt,
+    generation_config = {
+        "thinking_level" : "low",
+        "max_output_tokens" : 200
+    }
+)
+print(response.output_text)
 
